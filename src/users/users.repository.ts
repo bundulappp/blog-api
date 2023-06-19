@@ -22,6 +22,10 @@ export class UsersRepository extends Repository<UsersEntity> {
     return await this.findOne({ where: { id } });
   }
 
+  async getAllUsers(): Promise<UsersEntity[]> {
+    return await this.find();
+  }
+
   async updateUser(id: number, dto: UserDto): Promise<void> {
     //oAuth todo
   }
