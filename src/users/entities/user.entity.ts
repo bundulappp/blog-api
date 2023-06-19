@@ -1,5 +1,6 @@
-import { Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
+@Entity('users')
 export class UsersEntity {
   constructor(partial: Partial<UsersEntity>) {
     Object.assign(this, partial);
@@ -9,17 +10,17 @@ export class UsersEntity {
   id: number;
 
   @Column({
-    type: 'string',
+    type: 'varchar',
     length: 17,
     unique: true,
   })
   username: string;
 
   @Column({
-    type: 'string',
+    type: 'varchar',
   })
   password: string;
 
-  @Column({ type: 'string', length: 80, unique: true })
+  @Column({ type: 'varchar', length: 80, unique: true })
   email: string;
 }
