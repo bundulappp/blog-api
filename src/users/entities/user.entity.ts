@@ -23,4 +23,10 @@ export class UsersEntity {
 
   @Column({ type: 'varchar', length: 80, unique: true })
   email: string;
+
+  @Column({ type: 'boolean', default: true })
+  isActive: boolean;
+
+  @Column({ type: 'boolean', default: false })
+  isVerified: boolean;
 }
