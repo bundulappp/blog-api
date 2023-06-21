@@ -8,14 +8,15 @@ import {
   NotFoundException,
   Delete,
 } from '@nestjs/common';
-import { UsersService } from './users.service';
-import { UserDto } from './dto/user.dto';
+import { UsersService } from '../services/users.service';
+import { UserDto } from '../models/dto/user.dto';
+import { UserLoginView } from '../models/dto/user-login-view.model';
 
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Post()
+  @Post('register')
   create(@Body() createUserDto: UserDto) {
     try {
       return this.usersService.create(createUserDto);
@@ -36,7 +37,17 @@ export class UsersController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     try {
-      return this.usersService.findOne(+id);
+      return this.usersService.findOneById(+id);
+    } catch (error) {
+      throw new NotFoundException('User not found');
+    }
+  }
+
+  //create a login method
+  @Post('login')
+  login(@Body() userData: UserLoginView): Promise<any> {
+    try {
+      return this.usersService.login(userData);
     } catch (error) {
       throw new NotFoundException('User not found');
     }
@@ -46,13 +57,12 @@ export class UsersController {
   // update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
   //   return this.usersService.update(+id, updateUserDto);
   // }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    try {
-      return this.usersService.disable(+id);
-    } catch (error) {
-      throw new NotFoundException('User not found');
-    }
-  }
+  // @Delete(':id')
+  // remove(@Param('id') id: string) {
+  //   try {
+  //     return this.usersService.disable(+id);
+  //   } catch (error) {
+  //     throw new NotFoundException('User not found');
+  //   }
+  // }
 }
