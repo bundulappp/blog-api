@@ -7,6 +7,7 @@ import {
   UnprocessableEntityException,
   NotFoundException,
   Delete,
+  Put,
 } from '@nestjs/common';
 import { UsersService } from '../services/users.service';
 import { UserDto } from '../models/dto/user.dto';
@@ -52,17 +53,4 @@ export class UsersController {
       throw new NotFoundException('User not found');
     }
   }
-
-  // @Patch(':id')
-  // update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-  //   return this.usersService.update(+id, updateUserDto);
-  // }
-  // @Delete(':id')
-  // remove(@Param('id') id: string) {
-  //   try {
-  //     return this.usersService.disable(+id);
-  //   } catch (error) {
-  //     throw new NotFoundException('User not found');
-  //   }
-  // }
 }

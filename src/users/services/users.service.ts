@@ -10,6 +10,7 @@ import { UsersEntity } from '../entities/user.entity';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { UserLoginView } from '../models/dto/user-login-view.model';
+import { UpdateUserDto } from '../models/dto/update-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -40,6 +41,9 @@ export class UsersService {
 
     const newUser = this.userRepository.create(createUserDto);
     newUser.password = hash;
+    //date in the format of 2023-03-27 21:00:02, it is Date type
+    newUser.createdAt = new Date();
+    newUser.updatedAt = new Date();
 
     this.userRepository.save(newUser);
     return newUser;
@@ -93,17 +97,15 @@ export class UsersService {
     return payload;
   }
 
-  // update(id: number, updateUserDto: UpdateUserDto) {
-  //   return `This action updates a #${id} user`;
-  // }
+  update(id: number, updateUserDto: UpdateUserDto) {}
 
-  // async disable(id: number): Promise<void> {
-  //   const user = await this.findOne(id);
-  //   if (!user) {
-  //     throw new NotFoundException('User not found');
-  //   }
-  //   this.userRepository.update(id, { isActive: false });
-  // }
+  async disable(id: number): Promise<void> {
+    const user = await this.userRepository.findOne({ where: { id: id } });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    this.userRepository.update(id, { isActive: false });
+  }
 
   async validateUser(username: string, pass: string): Promise<any> {
     const user = await this.findOneByUsername(username);
