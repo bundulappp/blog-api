@@ -5,6 +5,8 @@ import { UsersController } from './controllers/users.controller';
 import { DatabaseModule } from 'src/database/database.module';
 import { userProviders } from './entities/user.providers';
 import { JwtAuthGuard } from './services/authGuard';
+import * as dotenv from 'dotenv';
+dotenv.config();
 
 @Module({
   imports: [
