@@ -11,7 +11,7 @@ import { UsersEntity } from '../entities/user.entity';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { UserLoginView } from '../models/dto/user-login-view.model';
-import { UpdateUserDto } from '../models/dto/update-user.dto';
+import { UpdateUserViewModel } from '../models/dto/update-user-view.model';
 
 @Injectable()
 export class UsersService {
@@ -97,11 +97,11 @@ export class UsersService {
 
     return payload;
   }
-  //get user id from token and update the user
+
   async disable(request: any): Promise<void> {
     const token = request.headers.authorization.split(' ')[1];
     const isVerified = this.jwtService.verify(token);
-    console.log(isVerified);
+
     if (!isVerified) {
       throw new UnauthorizedException('User not verified');
     }
@@ -135,18 +135,32 @@ export class UsersService {
     };
   }
 
-  async update(id: number, updateUserDto: UpdateUserDto): Promise<UsersEntity> {
+  async update(
+    req: any,
+    updateUserDto: UpdateUserViewModel,
+  ): Promise<UsersEntity> {
+    const token = req.headers.authorization.split(' ')[1];
+    const decodedToken = this.jwtService.verify(token);
+
+    if (!decodedToken || !decodedToken.id) {
+      throw new NotFoundException('User not found');
+    }
+
     const user = await this.userRepository.findOne({
-      where: { id: id },
+      where: { id: decodedToken.id },
     });
 
     if (!user) {
       throw new NotFoundException('User not found');
     }
 
-    const updatedUser = this.userRepository.create(updateUserDto);
-    updatedUser.updatedAt = new Date();
-    this.userRepository.update(id, updatedUser);
+    user.updatedAt = new Date();
+
+    const updatedUser = await this.userRepository.save({
+      ...user,
+      ...updateUserDto,
+    });
+
     return updatedUser;
   }
 }

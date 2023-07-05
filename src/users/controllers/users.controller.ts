@@ -66,10 +66,10 @@ export class UsersController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Put(':id')
-  updateById(@Param('id') id: string, @Body() updateUserDto: UserDto) {
+  @Put()
+  updateById(@Request() req, @Body() updateUserDto: UserDto) {
     try {
-      return this.usersService.update(+id, updateUserDto);
+      return this.usersService.update(req, updateUserDto);
     } catch (error) {
       throw new NotFoundException('User not found');
     }
