@@ -141,7 +141,6 @@ export class UsersService {
   ): Promise<UsersEntity> {
     const token = req.headers.authorization.split(' ')[1];
     const decodedToken = this.jwtService.verify(token);
-
     if (!decodedToken || !decodedToken.id) {
       throw new NotFoundException('User not found');
     }
