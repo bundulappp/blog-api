@@ -99,7 +99,8 @@ export class UsersService {
   }
   //get user id from token and update the user
   async disable(request: any): Promise<void> {
-    const isVerified = this.jwtService.verify(request.headers.authorization);
+    const token = request.headers.authorization.split(' ')[1];
+    const isVerified = this.jwtService.verify(token);
     console.log(isVerified);
     if (!isVerified) {
       throw new UnauthorizedException('User not verified');

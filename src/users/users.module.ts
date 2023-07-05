@@ -13,7 +13,7 @@ dotenv.config();
     DatabaseModule,
     JwtModule.register({
       secret: process.env.JWT_SECRET,
-      signOptions: { expiresIn: '60s' },
+      signOptions: { expiresIn: '1200s' },
     }),
   ],
   controllers: [UsersController],
