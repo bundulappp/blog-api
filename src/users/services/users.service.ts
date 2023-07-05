@@ -3,6 +3,7 @@ import {
   Inject,
   Injectable,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { UserDto } from '../models/dto/user.dto';
 import { Repository } from 'typeorm';
@@ -96,15 +97,19 @@ export class UsersService {
 
     return payload;
   }
+  //get user id from token and update the user
+  async disable(request: any): Promise<void> {
+    const isVerified = this.jwtService.verify(request.headers.authorization);
+    console.log(isVerified);
+    if (!isVerified) {
+      throw new UnauthorizedException('User not verified');
+    }
+    const user = this.userRepository.findOne({ where: { id: isVerified.id } });
 
-  update(id: number, updateUserDto: UpdateUserDto) {}
-
-  async disable(id: number): Promise<void> {
-    const user = await this.userRepository.findOne({ where: { id: id } });
     if (!user) {
       throw new NotFoundException('User not found');
     }
-    this.userRepository.update(id, { isActive: false });
+    this.userRepository.update(isVerified.id, { isActive: false });
   }
 
   async validateUser(username: string, pass: string): Promise<any> {
@@ -127,5 +132,20 @@ export class UsersService {
     return {
       access_token: this.jwtService.sign(payload),
     };
+  }
+
+  async update(id: number, updateUserDto: UpdateUserDto): Promise<UsersEntity> {
+    const user = await this.userRepository.findOne({
+      where: { id: id },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const updatedUser = this.userRepository.create(updateUserDto);
+    updatedUser.updatedAt = new Date();
+    this.userRepository.update(id, updatedUser);
+    return updatedUser;
   }
 }

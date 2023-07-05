@@ -4,14 +4,16 @@ import {
   Post,
   Body,
   Param,
+  Request,
   UnprocessableEntityException,
   NotFoundException,
-  Delete,
   Put,
+  UseGuards,
 } from '@nestjs/common';
 import { UsersService } from '../services/users.service';
 import { UserDto } from '../models/dto/user.dto';
 import { UserLoginView } from '../models/dto/user-login-view.model';
+import { JwtAuthGuard } from '../services/authGuard';
 
 @Controller('users')
 export class UsersController {
@@ -44,11 +46,30 @@ export class UsersController {
     }
   }
 
-  //create a login method
   @Post('login')
   login(@Body() userData: UserLoginView): Promise<any> {
     try {
       return this.usersService.login(userData);
+    } catch (error) {
+      throw new NotFoundException('User not found');
+    }
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Put('deactive')
+  update(@Request() req) {
+    try {
+      return this.usersService.disable(req);
+    } catch (error) {
+      throw new NotFoundException('User not found');
+    }
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Put(':id')
+  updateById(@Param('id') id: string, @Body() updateUserDto: UserDto) {
+    try {
+      return this.usersService.update(+id, updateUserDto);
     } catch (error) {
       throw new NotFoundException('User not found');
     }
