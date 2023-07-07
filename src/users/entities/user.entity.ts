@@ -1,4 +1,11 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  OneToMany,
+} from 'typeorm';
+import { UserRelationshipEntity } from './user-relationship.entity';
 
 @Entity('users')
 export class UsersEntity {
@@ -35,4 +42,18 @@ export class UsersEntity {
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   updatedAt: Date;
+
+  @OneToMany(
+    () => UserRelationshipEntity,
+    (relationship) => relationship.followerId,
+    { cascade: true },
+  )
+  followers: UserRelationshipEntity[];
+
+  @OneToMany(
+    () => UserRelationshipEntity,
+    (relationship) => relationship.followedId,
+    { cascade: true },
+  )
+  followings: UserRelationshipEntity[];
 }
