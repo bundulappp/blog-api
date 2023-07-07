@@ -12,8 +12,10 @@ import {
 } from '@nestjs/common';
 import { UsersService } from '../services/users.service';
 import { UserDto } from '../models/dto/user.dto';
-import { UserLoginView } from '../models/dto/user-login-view.model';
+import { UserLoginView } from '../models/dto/user-login-request-view.model';
 import { JwtAuthGuard } from '../services/authGuard';
+import { ChangePasswordViewModel } from '../models/change-password-view.model';
+import { UserLoginResponseModel } from '../models/dto/user-login-response.model';
 
 @Controller('users')
 export class UsersController {
@@ -29,7 +31,7 @@ export class UsersController {
   }
 
   @Get()
-  findAll() {
+  findAll(): Promise<UserLoginResponseModel[]> {
     try {
       return this.usersService.findAll();
     } catch (error) {
@@ -38,7 +40,7 @@ export class UsersController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id') id: string): Promise<UserLoginResponseModel> {
     try {
       return this.usersService.findOneById(+id);
     } catch (error) {
@@ -47,7 +49,7 @@ export class UsersController {
   }
 
   @Post('login')
-  login(@Body() userData: UserLoginView): Promise<any> {
+  login(@Body() userData: UserLoginView): Promise<UserLoginResponseModel> {
     try {
       return this.usersService.login(userData);
     } catch (error) {
@@ -70,6 +72,16 @@ export class UsersController {
   updateById(@Request() req, @Body() updateUserDto: UserDto) {
     try {
       return this.usersService.update(req, updateUserDto);
+    } catch (error) {
+      throw new NotFoundException('User not found');
+    }
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Put('change-password')
+  changePassword(@Request() req, @Body() userData: ChangePasswordViewModel) {
+    try {
+      return this.usersService.changePassword(req, userData);
     } catch (error) {
       throw new NotFoundException('User not found');
     }

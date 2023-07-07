@@ -10,8 +10,9 @@ import { Repository } from 'typeorm';
 import { UsersEntity } from '../entities/user.entity';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
-import { UserLoginView } from '../models/dto/user-login-view.model';
+import { UserLoginView } from '../models/dto/user-login-request-view.model';
 import { UpdateUserViewModel } from '../models/dto/update-user-view.model';
+import { ChangePasswordViewModel } from '../models/change-password-view.model';
 
 @Injectable()
 export class UsersService {
@@ -135,10 +136,7 @@ export class UsersService {
     };
   }
 
-  async update(
-    req: any,
-    updateUserDto: UpdateUserViewModel,
-  ): Promise<UsersEntity> {
+  async update(req: any, updateUserDto: UpdateUserViewModel): Promise<number> {
     const token = req.headers.authorization.split(' ')[1];
     const decodedToken = this.jwtService.verify(token);
     if (!decodedToken || !decodedToken.id) {
@@ -160,6 +158,42 @@ export class UsersService {
       ...updateUserDto,
     });
 
-    return updatedUser;
+    return updatedUser.id;
+  }
+
+  async changePassword(
+    req: any,
+    passwordData: ChangePasswordViewModel,
+  ): Promise<void> {
+    const token = req.headers.authorization.split(' ')[1];
+    const decodedToken = this.jwtService.verify(token);
+    if (!decodedToken || !decodedToken.id) {
+      throw new NotFoundException('User not found');
+    }
+
+    const user = await this.userRepository.findOne({
+      where: { id: decodedToken.id },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const isMatch = await bcrypt.compare(
+      passwordData.currentPassword,
+      user.password,
+    );
+
+    if (!isMatch) {
+      throw new NotFoundException('Password is incorrect');
+    }
+
+    const salt = await bcrypt.genSalt();
+    const hash = await bcrypt.hash(passwordData.newPassword, salt);
+
+    user.password = hash;
+    user.updatedAt = new Date();
+
+    await this.userRepository.save(user);
   }
 }
