@@ -39,8 +39,8 @@ export class UsersController {
     }
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string): Promise<UserLoginResponseModel> {
+  @Get(':userId')
+  findOne(@Param('userId') id: string): Promise<UserLoginResponseModel> {
     try {
       return this.usersService.findOneById(+id);
     } catch (error) {
@@ -82,6 +82,17 @@ export class UsersController {
   changePassword(@Request() req, @Body() userData: ChangePasswordViewModel) {
     try {
       return this.usersService.changePassword(req, userData);
+    } catch (error) {
+      throw new NotFoundException('User not found');
+    }
+  }
+
+  //create an endpoint to allow the user to follow another user
+  @UseGuards(JwtAuthGuard)
+  @Post(':userId/follow')
+  followUser(@Request() req, @Param('userId') userId: number) {
+    try {
+      return this.usersService.followUser(req, userId);
     } catch (error) {
       throw new NotFoundException('User not found');
     }

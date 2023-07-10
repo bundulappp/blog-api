@@ -13,11 +13,14 @@ import { JwtService } from '@nestjs/jwt';
 import { UserLoginView } from '../models/dto/user-login-request-view.model';
 import { UpdateUserViewModel } from '../models/dto/update-user-view.model';
 import { ChangePasswordViewModel } from '../models/change-password-view.model';
+import { UserRelationshipEntity } from '../entities/user-relationship.entity';
 
 @Injectable()
 export class UsersService {
   constructor(
     @Inject('USER_REPOSITORY') private userRepository: Repository<UsersEntity>,
+    @Inject('USER_RELATIONSHIP_REPOSITORY')
+    private userRelationshipRepository: Repository<UserRelationshipEntity>,
     private jwtService: JwtService,
   ) {}
 
@@ -195,5 +198,50 @@ export class UsersService {
     user.updatedAt = new Date();
 
     await this.userRepository.save(user);
+  }
+
+  async followUser(req: any, userId: number): Promise<void> {
+    const token = req.headers.authorization.split(' ')[1];
+    const decodedToken = this.jwtService.verify(token);
+
+    if (!decodedToken || !decodedToken.id) {
+      throw new NotFoundException('User not found');
+    }
+
+    const user = await this.userRepository.findOne({
+      where: { id: decodedToken.id },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const userToFollow = await this.userRepository.findOne({
+      where: { id: userId },
+    });
+
+    if (!userToFollow) {
+      throw new NotFoundException('User not found');
+    }
+    //todo check if user is already following
+
+    const isAlreadyFollowing = await this.userRelationshipRepository.findOne({
+      where: { followerId: user.id, followedId: userToFollow.id },
+    });
+
+    if (isAlreadyFollowing) {
+      throw new ConflictException('User is already following');
+    }
+    const userRelationshipData = {
+      followerId: user.id,
+      followedId: userToFollow.id,
+      createdAt: new Date(),
+    };
+
+    const userRelationshipEntity = await this.userRelationshipRepository.create(
+      userRelationshipData,
+    );
+
+    this.userRelationshipRepository.save(userRelationshipEntity);
   }
 }

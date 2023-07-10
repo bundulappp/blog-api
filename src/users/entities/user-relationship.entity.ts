@@ -25,13 +25,23 @@ export class UserRelationshipEntity {
 
   @Column({
     type: 'int',
+    nullable: true,
+    default: null,
   })
   followerId: number;
 
   @Column({
     type: 'int',
+    nullable: true,
+    default: null,
   })
   followedId: number;
+
+  @Column({
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  updatedAt: Date;
 
   @ManyToOne(() => UsersEntity, (user) => user.followers)
   @JoinColumn({ name: 'followerId' })
