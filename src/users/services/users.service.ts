@@ -223,7 +223,6 @@ export class UsersService {
     if (!userToFollow) {
       throw new NotFoundException('User not found');
     }
-    //todo check if user is already following
 
     const isAlreadyFollowing = await this.userRelationshipRepository.findOne({
       where: { followerId: user.id, followedId: userToFollow.id },
@@ -232,6 +231,7 @@ export class UsersService {
     if (isAlreadyFollowing) {
       throw new ConflictException('User is already following');
     }
+
     const userRelationshipData = {
       followerId: user.id,
       followedId: userToFollow.id,
@@ -243,5 +243,41 @@ export class UsersService {
     );
 
     this.userRelationshipRepository.save(userRelationshipEntity);
+  }
+
+  async unfollowUser(req: any, userId: number): Promise<void> {
+    console.log(req);
+    const token = req.headers.authorization.split(' ')[1];
+    const decodedToken = this.jwtService.verify(token);
+
+    if (!decodedToken || !decodedToken.id) {
+      throw new NotFoundException('User not found');
+    }
+
+    const user = await this.userRepository.findOne({
+      where: { id: decodedToken.id },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const userToUnfollow = await this.userRepository.findOne({
+      where: { id: userId },
+    });
+
+    if (!userToUnfollow) {
+      throw new NotFoundException('User not found');
+    }
+
+    const isAlreadyFollowing = await this.userRelationshipRepository.findOne({
+      where: { followerId: user.id, followedId: userToUnfollow.id },
+    });
+
+    if (!isAlreadyFollowing) {
+      throw new ConflictException('User is not following');
+    }
+
+    await this.userRelationshipRepository.delete(isAlreadyFollowing.id);
   }
 }

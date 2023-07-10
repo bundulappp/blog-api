@@ -9,6 +9,7 @@ import {
   NotFoundException,
   Put,
   UseGuards,
+  Delete,
 } from '@nestjs/common';
 import { UsersService } from '../services/users.service';
 import { UserDto } from '../models/dto/user.dto';
@@ -87,12 +88,21 @@ export class UsersController {
     }
   }
 
-  //create an endpoint to allow the user to follow another user
   @UseGuards(JwtAuthGuard)
   @Post(':userId/follow')
   followUser(@Request() req, @Param('userId') userId: number) {
     try {
       return this.usersService.followUser(req, userId);
+    } catch (error) {
+      throw new NotFoundException('User not found');
+    }
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete(':userId/unfollow')
+  unfollowUser(@Request() req, @Param('userId') userId: number) {
+    try {
+      return this.usersService.unfollowUser(req, userId);
     } catch (error) {
       throw new NotFoundException('User not found');
     }
