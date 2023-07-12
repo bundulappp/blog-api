@@ -107,4 +107,23 @@ export class UsersController {
       throw new NotFoundException('User not found');
     }
   }
+
+  @Get('/:userId/followers')
+  getFollowers(@Param('userId') userId: number) {
+    try {
+      return this.usersService.getFollowers(+userId);
+    } catch (error) {
+      throw new NotFoundException('User not found');
+    }
+  }
+
+  // @UseGuards(JwtAuthGuard)
+  // @Get('followings')
+  // getFollowings(@Request() req) {
+  //   try {
+  //     return this.usersService.getFollowings(req);
+  //   } catch (error) {
+  //     throw new NotFoundException('User not found');
+  //   }
+  // }
 }

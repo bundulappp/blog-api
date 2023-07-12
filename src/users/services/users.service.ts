@@ -6,7 +6,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { UserDto } from '../models/dto/user.dto';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { UsersEntity } from '../entities/user.entity';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
@@ -207,6 +207,9 @@ export class UsersService {
     if (!decodedToken || !decodedToken.id) {
       throw new NotFoundException('User not found');
     }
+    if (decodedToken.id === +userId) {
+      throw new ConflictException('Users are not able to follow themselves');
+    }
 
     const user = await this.userRepository.findOne({
       where: { id: decodedToken.id },
@@ -217,7 +220,7 @@ export class UsersService {
     }
 
     const userToFollow = await this.userRepository.findOne({
-      where: { id: userId },
+      where: { id: +userId },
     });
 
     if (!userToFollow) {
@@ -246,7 +249,6 @@ export class UsersService {
   }
 
   async unfollowUser(req: any, userId: number): Promise<void> {
-    console.log(req);
     const token = req.headers.authorization.split(' ')[1];
     const decodedToken = this.jwtService.verify(token);
 
@@ -280,4 +282,43 @@ export class UsersService {
 
     await this.userRelationshipRepository.delete(isAlreadyFollowing.id);
   }
+
+  async getFollowers(userId: number): Promise<UsersEntity[]> {
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+    });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    console.log(followers);
+    return [];
+  }
+
+  // async getFollowing(req: any): Promise<UsersEntity[]> {
+  //   const token = req.headers.authorization.split(' ')[1];
+  //   const decodedToken = this.jwtService.verify(token);
+
+  //   if (!decodedToken || !decodedToken.id) {
+  //     throw new NotFoundException('User not found');
+  //   }
+
+  //   const user = await this.userRepository.findOne({
+  //     where: { id: decodedToken.id },
+  //   });
+  //   if (!user) {
+  //     throw new NotFoundException('User not found');
+  //   }
+
+  //   const following = await this.userRelationshipRepository.find({
+  //     where: { followerId: user.id },
+  //   });
+
+  //   if (!following) {
+  //     throw new NotFoundException('Following not found');
+  //   }
+
+  //   const followingList = following.map((follower) => follower.followed);
+  //   return followingList;
+  // }
 }

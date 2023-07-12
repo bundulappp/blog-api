@@ -14,7 +14,7 @@ import {
 } from 'typeorm';
 import { UsersEntity } from './user.entity';
 
-@Entity('user-relationship')
+@Entity('user_relationship')
 export class UserRelationshipEntity {
   constructor(partial: Partial<UserRelationshipEntity>) {
     Object.assign(this, partial);
