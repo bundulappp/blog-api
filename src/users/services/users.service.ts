@@ -291,8 +291,15 @@ export class UsersService {
       throw new NotFoundException('User not found');
     }
 
-    console.log(followers);
-    return [];
+    const followers = await this.userRelationshipRepository
+      .createQueryBuilder('relationship')
+      .leftJoinAndSelect('relationship.follower', 'follower')
+      .where('relationship.followedId = :userId', { userId: user.id })
+      .getMany();
+
+    const followerUsers = followers.map((follower) => follower.follower);
+
+    return followerUsers;
   }
 
   // async getFollowing(req: any): Promise<UsersEntity[]> {
