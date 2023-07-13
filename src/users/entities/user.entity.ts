@@ -4,15 +4,13 @@ import {
   PrimaryGeneratedColumn,
   ManyToOne,
   OneToMany,
+  JoinColumn,
 } from 'typeorm';
 import { UserRelationshipEntity } from './user-relationship.entity';
+import { UserRolesEntity } from './user-roles.entity';
 
 @Entity('users')
 export class UsersEntity {
-  constructor(partial: Partial<UsersEntity>) {
-    Object.assign(this, partial);
-  }
-
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -56,4 +54,7 @@ export class UsersEntity {
     { cascade: true },
   )
   followings: UserRelationshipEntity[];
+
+  @OneToMany(() => UserRolesEntity, (roles) => roles.user)
+  roles: UserRolesEntity;
 }
