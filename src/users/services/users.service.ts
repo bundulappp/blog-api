@@ -302,30 +302,22 @@ export class UsersService {
     return followerUsers;
   }
 
-  // async getFollowing(req: any): Promise<UsersEntity[]> {
-  //   const token = req.headers.authorization.split(' ')[1];
-  //   const decodedToken = this.jwtService.verify(token);
+  async getFollowings(userId: number): Promise<UsersEntity[]> {
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+    });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
 
-  //   if (!decodedToken || !decodedToken.id) {
-  //     throw new NotFoundException('User not found');
-  //   }
+    const followings = await this.userRelationshipRepository
+      .createQueryBuilder('relationship')
+      .leftJoinAndSelect('relationship.followed', 'followed')
+      .where('relationship.followerId = :userId', { userId: user.id })
+      .getMany();
 
-  //   const user = await this.userRepository.findOne({
-  //     where: { id: decodedToken.id },
-  //   });
-  //   if (!user) {
-  //     throw new NotFoundException('User not found');
-  //   }
+    const followingUsers = followings.map((following) => following.followed);
 
-  //   const following = await this.userRelationshipRepository.find({
-  //     where: { followerId: user.id },
-  //   });
-
-  //   if (!following) {
-  //     throw new NotFoundException('Following not found');
-  //   }
-
-  //   const followingList = following.map((follower) => follower.followed);
-  //   return followingList;
-  // }
+    return followingUsers;
+  }
 }
