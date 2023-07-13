@@ -120,7 +120,7 @@ export class UsersController {
   @Get('/:userId/followings')
   getFollowings(@Param('userId') userId: number) {
     try {
-      return this.usersService.getFollowings(userId);
+      return this.usersService.getFollowings(+userId);
     } catch (error) {
       throw new NotFoundException('User not found');
     }
