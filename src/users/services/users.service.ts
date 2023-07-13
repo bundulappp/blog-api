@@ -40,13 +40,11 @@ export class UsersService {
     if (userWithSameUsername) {
       throw new ConflictException('User already exists with this username');
     }
-    //const isMatch = await bcrypt.compare(password, hash);
     const salt = await bcrypt.genSalt();
     const hash = await bcrypt.hash(createUserDto.password, salt);
 
     const newUser = this.userRepository.create(createUserDto);
     newUser.password = hash;
-    //date in the format of 2023-03-27 21:00:02, it is Date type
     newUser.createdAt = new Date();
     newUser.updatedAt = new Date();
 
