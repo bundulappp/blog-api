@@ -12,10 +12,12 @@ export const databaseProviders = [
         password: process.env.DB_PASSWORD,
         database: 'blog',
         entities: [__dirname + '/../**/*.entity{.ts,.js}'],
-        synchronize: true,
+        migrations: [__dirname + '/../migrations/*.js'],
+        migrationsTableName: 'migrations',
       });
 
-      return dataSource.initialize();
+      await dataSource.initialize();
+      return dataSource;
     },
   },
 ];

@@ -14,6 +14,7 @@ import { UserLoginView } from '../models/dto/user-login-request-view.model';
 import { UpdateUserViewModel } from '../models/dto/update-user-view.model';
 import { ChangePasswordViewModel } from '../models/change-password-view.model';
 import { UserRelationshipEntity } from '../entities/user-relationship.entity';
+import * as dotenv from 'dotenv';
 
 @Injectable()
 export class UsersService {
@@ -317,5 +318,26 @@ export class UsersService {
     const followingUsers = followings.map((following) => following.followed);
 
     return followingUsers;
+  }
+
+  //create a function to seed user_role table
+
+  async seedUserTable(): Promise<void> {
+    const admin = new UsersEntity();
+    admin.username = 'admin';
+    admin.email = 'admin@blog.eu';
+    admin.password = process.env.ADMIN_SECRET;
+    admin.isActive = true;
+    admin.isVerified = true;
+
+    const moderator = new UsersEntity();
+    moderator.username = 'moderato';
+    moderator.email = 'moderator@blog.eu';
+    moderator.password = process.env.MODERATOR_SECRET;
+    moderator.isActive = true;
+    moderator.isVerified = true;
+
+    this.userRepository.save(admin);
+    this.userRepository.save(moderator);
   }
 }
