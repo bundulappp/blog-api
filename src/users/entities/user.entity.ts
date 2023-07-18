@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 import { UserRelationshipEntity } from './user-relationship.entity';
 import { UserRolesEntity } from './user-roles.entity';
+import { RefreshTokenEntity } from './refresh-token.entity';
 
 @Entity('users')
 export class UsersEntity {
@@ -57,4 +58,7 @@ export class UsersEntity {
 
   @OneToMany(() => UserRolesEntity, (roles) => roles.user)
   roles: UserRolesEntity;
+
+  @OneToMany(() => RefreshTokenEntity, (refreshToken) => refreshToken.user)
+  refreshTokens: RefreshTokenEntity[];
 }
