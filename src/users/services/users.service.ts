@@ -1,6 +1,5 @@
 import {
   ConflictException,
-  Inject,
   Injectable,
   NotFoundException,
   UnauthorizedException,
@@ -14,13 +13,14 @@ import { UserLoginView } from '../models/dto/user-login-request-view.model';
 import { UpdateUserViewModel } from '../models/dto/update-user-view.model';
 import { ChangePasswordViewModel } from '../models/change-password-view.model';
 import { UserRelationshipEntity } from '../entities/user-relationship.entity';
-import * as dotenv from 'dotenv';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class UsersService {
   constructor(
-    @Inject('USER_REPOSITORY') private userRepository: Repository<UsersEntity>,
-    @Inject('USER_RELATIONSHIP_REPOSITORY')
+    @InjectRepository(UsersEntity)
+    private userRepository: Repository<UsersEntity>,
+    @InjectRepository(UserRelationshipEntity)
     private userRelationshipRepository: Repository<UserRelationshipEntity>,
     private jwtService: JwtService,
   ) {}
