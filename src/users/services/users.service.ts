@@ -14,6 +14,8 @@ import { UpdateUserViewModel } from '../models/dto/update-user-view.model';
 import { ChangePasswordViewModel } from '../models/change-password-view.model';
 import { UserRelationshipEntity } from '../entities/user-relationship.entity';
 import { InjectRepository } from '@nestjs/typeorm';
+import { AuthResultModel } from '../models/auth-result.model';
+import { RefreshTokenEntity } from '../entities/refresh-token.entity';
 
 @Injectable()
 export class UsersService {
@@ -22,6 +24,8 @@ export class UsersService {
     private userRepository: Repository<UsersEntity>,
     @InjectRepository(UserRelationshipEntity)
     private userRelationshipRepository: Repository<UserRelationshipEntity>,
+    @InjectRepository(RefreshTokenEntity)
+    private refreshTokenRepository: Repository<RefreshTokenEntity>,
     private jwtService: JwtService,
   ) {}
 
@@ -81,7 +85,7 @@ export class UsersService {
     return user;
   }
 
-  async login(userDto: UserLoginView): Promise<any> {
+  async login(userDto: UserLoginView): Promise<AuthResultModel> {
     const user = await this.userRepository.findOne({
       where: { username: userDto.username },
     });
@@ -96,9 +100,9 @@ export class UsersService {
       throw new NotFoundException('Password is incorrect');
     }
 
-    const payload = this.createJwtPayload(user);
+    const authResult = this.createJwtPayload(user);
 
-    return payload;
+    return authResult;
   }
 
   async disable(request: any): Promise<void> {
@@ -125,16 +129,35 @@ export class UsersService {
     return null;
   }
 
-  async createJwtPayload(user: UserDto) {
-    const payload = {
+  async createJwtPayload(user: UserDto): Promise<AuthResultModel> {
+    const accesTokenPayload = {
+      id: user.id,
       username: user.username,
       email: user.email,
-      isActive: user.isActive,
-      isVerified: user.isVerified,
+    };
+
+    const refreshTokenPayload = {
       id: user.id,
     };
+
+    const accessToken = this.jwtService.sign(accesTokenPayload);
+    const refreshToken = this.jwtService.sign(refreshTokenPayload, {
+      expiresIn: '7d',
+    });
+
+    this.refreshTokenRepository.save({
+      token: refreshToken,
+      user: user,
+      isRevoked: false,
+      isUsed: false,
+      createdAt: new Date(),
+      expiresAt: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000),
+    });
+
     return {
-      access_token: this.jwtService.sign(payload),
+      accessToken,
+      refreshToken,
+      success: true,
     };
   }
 
