@@ -10,6 +10,7 @@ import {
   Put,
   UseGuards,
   Delete,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { UsersService } from '../services/users.service';
 import { UserDto } from '../models/dto/user.dto';
@@ -17,6 +18,7 @@ import { UserLoginView } from '../models/dto/user-login-request-view.model';
 import { JwtAuthGuard } from '../services/authGuard';
 import { ChangePasswordViewModel } from '../models/change-password-view.model';
 import { UserLoginResponseModel } from '../models/dto/user-login-response.model';
+import { TokenRequestDto } from '../models/dto/token-request.dto';
 
 @Controller('users')
 export class UsersController {
@@ -32,7 +34,7 @@ export class UsersController {
   }
 
   @Get()
-  findAll(): Promise<UserLoginResponseModel[]> {
+  findAll(): Promise<UserDto[]> {
     try {
       return this.usersService.findAll();
     } catch (error) {
@@ -41,7 +43,7 @@ export class UsersController {
   }
 
   @Get(':userId')
-  findOne(@Param('userId') id: string): Promise<UserLoginResponseModel> {
+  findOne(@Param('userId') id: string): Promise<UserDto> {
     try {
       return this.usersService.findOneById(+id);
     } catch (error) {
@@ -123,6 +125,15 @@ export class UsersController {
       return this.usersService.getFollowings(+userId);
     } catch (error) {
       throw new NotFoundException('User not found');
+    }
+  }
+  @UseGuards(JwtAuthGuard)
+  @Post('refresh-token')
+  refreshToken(@Body() tokenRequestDto: TokenRequestDto) {
+    try {
+      return this.usersService.refreshToken(tokenRequestDto);
+    } catch (error) {
+      throw new UnauthorizedException('User need to login again');
     }
   }
 }

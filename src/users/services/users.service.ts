@@ -16,6 +16,9 @@ import { UserRelationshipEntity } from '../entities/user-relationship.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AuthResultModel } from '../models/auth-result.model';
 import { RefreshTokenEntity } from '../entities/refresh-token.entity';
+import { TokenRequestDto } from '../models/dto/token-request.dto';
+import { JwtStrategy } from './jwtStrategy';
+import { UserLoginResponseModel } from '../models/dto/user-login-response.model';
 
 @Injectable()
 export class UsersService {
@@ -27,6 +30,7 @@ export class UsersService {
     @InjectRepository(RefreshTokenEntity)
     private refreshTokenRepository: Repository<RefreshTokenEntity>,
     private jwtService: JwtService,
+    private jwtStrategy: JwtStrategy,
   ) {}
 
   async create(createUserDto: UserDto): Promise<UsersEntity> {
@@ -85,7 +89,7 @@ export class UsersService {
     return user;
   }
 
-  async login(userDto: UserLoginView): Promise<AuthResultModel> {
+  async login(userDto: UserLoginView): Promise<UserLoginResponseModel> {
     const user = await this.userRepository.findOne({
       where: { username: userDto.username },
     });
@@ -100,9 +104,15 @@ export class UsersService {
       throw new NotFoundException('Password is incorrect');
     }
 
-    const authResult = this.createJwtPayload(user);
+    const authResult = await this.createJwtPayload(user);
 
-    return authResult;
+    return {
+      id: user.id,
+      username: user.username,
+      email: user.email,
+      accessToken: authResult.accessToken,
+      refreshToken: authResult.refreshToken,
+    };
   }
 
   async disable(request: any): Promise<void> {
@@ -134,6 +144,7 @@ export class UsersService {
       id: user.id,
       username: user.username,
       email: user.email,
+      expiredAt: new Date(Date.now() + 60 * 1000),
     };
 
     const refreshTokenPayload = {
@@ -142,7 +153,7 @@ export class UsersService {
 
     const accessToken = this.jwtService.sign(accesTokenPayload);
     const refreshToken = this.jwtService.sign(refreshTokenPayload, {
-      expiresIn: '7d',
+      expiresIn: '320s',
     });
 
     this.refreshTokenRepository.save({
@@ -151,7 +162,7 @@ export class UsersService {
       isRevoked: false,
       isUsed: false,
       createdAt: new Date(),
-      expiresAt: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000),
+      expiresAt: new Date(new Date().getTime() + 2 * 60 * 1000),
     });
 
     return {
@@ -343,24 +354,47 @@ export class UsersService {
     return followingUsers;
   }
 
-  //create a function to seed user_role table
+  async refreshToken(
+    tokenRequestDto: TokenRequestDto,
+  ): Promise<AuthResultModel> {
+    const isValid = this.jwtStrategy.validate(tokenRequestDto);
+    //handle if access token is not expired
+    //etc....
 
-  async seedUserTable(): Promise<void> {
-    const admin = new UsersEntity();
-    admin.username = 'admin';
-    admin.email = 'admin@blog.eu';
-    admin.password = process.env.ADMIN_SECRET;
-    admin.isActive = true;
-    admin.isVerified = true;
+    if (!isValid) {
+      throw new UnauthorizedException('User need to login again');
+    }
 
-    const moderator = new UsersEntity();
-    moderator.username = 'moderato';
-    moderator.email = 'moderator@blog.eu';
-    moderator.password = process.env.MODERATOR_SECRET;
-    moderator.isActive = true;
-    moderator.isVerified = true;
+    const user = await this.userRepository.findOne({
+      where: { id: tokenRequestDto.accessToken.userId },
+    });
 
-    this.userRepository.save(admin);
-    this.userRepository.save(moderator);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const authResult = this.createJwtPayload(user);
+
+    return authResult;
   }
+
+  //create a function to seed user_role table
+  // async seedUserTable(): Promise<void> {
+  //   const admin = new UsersEntity();
+  //   admin.username = 'admin';
+  //   admin.email = 'admin@blog.eu';
+  //   admin.password = process.env.ADMIN_SECRET;
+  //   admin.isActive = true;
+  //   admin.isVerified = true;
+
+  //   const moderator = new UsersEntity();
+  //   moderator.username = 'moderato';
+  //   moderator.email = 'moderator@blog.eu';
+  //   moderator.password = process.env.MODERATOR_SECRET;
+  //   moderator.isActive = true;
+  //   moderator.isVerified = true;
+
+  //   this.userRepository.save(admin);
+  //   this.userRepository.save(moderator);
+  // }
 }
