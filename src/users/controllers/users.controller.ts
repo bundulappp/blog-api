@@ -127,7 +127,7 @@ export class UsersController {
       throw new NotFoundException('User not found');
     }
   }
-  @UseGuards(JwtAuthGuard)
+
   @Post('refresh-token')
   refreshToken(@Body() tokenRequestDto: TokenRequestDto) {
     try {

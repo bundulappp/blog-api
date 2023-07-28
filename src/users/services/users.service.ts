@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   NotFoundException,
@@ -19,6 +20,8 @@ import { RefreshTokenEntity } from '../entities/refresh-token.entity';
 import { TokenRequestDto } from '../models/dto/token-request.dto';
 import { JwtStrategy } from './jwtStrategy';
 import { UserLoginResponseModel } from '../models/dto/user-login-response.model';
+import { AccessTokenPayload } from '../models/acces-token.model';
+import { RefreshTokenPayload } from '../models/refresh-token.model';
 
 @Injectable()
 export class UsersService {
@@ -144,7 +147,6 @@ export class UsersService {
       id: user.id,
       username: user.username,
       email: user.email,
-      expiredAt: new Date(Date.now() + 60 * 1000),
     };
 
     const refreshTokenPayload = {
@@ -153,7 +155,7 @@ export class UsersService {
 
     const accessToken = this.jwtService.sign(accesTokenPayload);
     const refreshToken = this.jwtService.sign(refreshTokenPayload, {
-      expiresIn: '320s',
+      expiresIn: '7d',
     });
 
     this.refreshTokenRepository.save({
@@ -162,7 +164,7 @@ export class UsersService {
       isRevoked: false,
       isUsed: false,
       createdAt: new Date(),
-      expiresAt: new Date(new Date().getTime() + 2 * 60 * 1000),
+      expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
     });
 
     return {
@@ -357,20 +359,31 @@ export class UsersService {
   async refreshToken(
     tokenRequestDto: TokenRequestDto,
   ): Promise<AuthResultModel> {
-    const isValid = this.jwtStrategy.validate(tokenRequestDto);
-    //handle if access token is not expired
-    //etc....
-
-    if (!isValid) {
-      throw new UnauthorizedException('User need to login again');
+    if (!tokenRequestDto) {
+      throw new BadRequestException('Token is required');
     }
+    const decodedAccessToken: AccessTokenPayload = this.jwtService.verify(
+      tokenRequestDto.accessToken,
+    );
 
     const user = await this.userRepository.findOne({
-      where: { id: tokenRequestDto.accessToken.userId },
+      where: { id: decodedAccessToken.userId },
     });
 
     if (!user) {
       throw new NotFoundException('User not found');
+    }
+
+    const decodedRefreshToken: RefreshTokenPayload = this.jwtService.verify(
+      tokenRequestDto.refreshToken,
+    );
+    const isValid = this.jwtStrategy.validate(
+      decodedAccessToken,
+      decodedRefreshToken,
+    );
+
+    if (!isValid) {
+      throw new UnauthorizedException('User need to login again');
     }
 
     const authResult = this.createJwtPayload(user);

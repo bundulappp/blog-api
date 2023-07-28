@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import * as dotenv from 'dotenv';
@@ -6,7 +6,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { RefreshTokenEntity } from '../entities/refresh-token.entity';
 import { Repository } from 'typeorm';
 import { AccessTokenPayload } from '../models/acces-token.model';
-import { TokenRequestDto } from '../models/dto/token-request.dto';
 import { RefreshTokenPayload } from '../models/refresh-token.model';
 dotenv.config();
 
@@ -23,30 +22,23 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(payload: TokenRequestDto): Promise<boolean> {
-    const isValidAccessToken = this.validateAccessToken(payload.accessToken);
-
-    if (!isValidAccessToken) {
-      return false;
-    }
-
+  async validate(
+    accessTokenPayload: AccessTokenPayload,
+    refreshTokenPayload: RefreshTokenPayload,
+  ): Promise<boolean> {
+    const isValidAccessToken = this.validateAccessToken(accessTokenPayload);
     const isValidRefreshToken = await this.validateRefreshToken(
-      payload.refreshToken,
+      refreshTokenPayload,
     );
 
-    if (!isValidRefreshToken) {
+    if (!isValidAccessToken || !isValidRefreshToken) {
       return false;
     }
-
     return true;
   }
 
   private validateAccessToken(payload: AccessTokenPayload): boolean {
-    if (payload.expiredAt < new Date()) {
-      return false;
-    }
-
-    return true;
+    return payload.expiredAt < new Date() ? false : true;
   }
 
   private async validateRefreshToken(
