@@ -19,6 +19,7 @@ import { JwtAuthGuard } from '../services/authGuard';
 import { ChangePasswordViewModel } from '../models/change-password-view.model';
 import { UserLoginResponseModel } from '../models/dto/user-login-response.model';
 import { TokenRequestDto } from '../models/dto/token-request.dto';
+import { UserUpdateDto } from '../models/dto/user-update.dto';
 
 @Controller('users')
 export class UsersController {
@@ -72,7 +73,7 @@ export class UsersController {
 
   @UseGuards(JwtAuthGuard)
   @Put()
-  updateById(@Request() req, @Body() updateUserDto: UserDto) {
+  updateById(@Request() req, @Body() updateUserDto: UserUpdateDto) {
     try {
       return this.usersService.update(req, updateUserDto);
     } catch (error) {
