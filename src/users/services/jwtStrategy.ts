@@ -3,7 +3,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import * as dotenv from 'dotenv';
 import { InjectRepository } from '@nestjs/typeorm';
-import { RefreshTokenEntity } from '../entities/refresh-token.entity';
+import { RefreshTokenEntity } from '../../entities/refresh-token.entity';
 import { Repository } from 'typeorm';
 import { AccessTokenPayload } from '../models/acces-token.model';
 import { RefreshTokenPayload } from '../models/refresh-token.model';
