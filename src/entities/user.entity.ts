@@ -9,6 +9,7 @@ import {
 import { UserRelationshipEntity } from './user-relationship.entity';
 import { UserRolesEntity } from './user-roles.entity';
 import { RefreshTokenEntity } from './refresh-token.entity';
+import { PhotoEntity } from 'src/entities/photo.entity';
 
 @Entity('users')
 export class UsersEntity {
@@ -61,4 +62,7 @@ export class UsersEntity {
 
   @OneToMany(() => RefreshTokenEntity, (refreshToken) => refreshToken.user)
   refreshTokens: RefreshTokenEntity[];
+
+  @OneToMany(() => PhotoEntity, (photo) => photo.user)
+  photos: PhotoEntity[];
 }
