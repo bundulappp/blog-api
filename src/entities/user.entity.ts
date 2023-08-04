@@ -1,11 +1,4 @@
-import {
-  Column,
-  Entity,
-  PrimaryGeneratedColumn,
-  ManyToOne,
-  OneToMany,
-  JoinColumn,
-} from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
 import { UserRelationshipEntity } from './user-relationship.entity';
 import { UserRolesEntity } from './user-roles.entity';
 import { RefreshTokenEntity } from './refresh-token.entity';
@@ -57,8 +50,8 @@ export class UsersEntity {
   )
   followings: UserRelationshipEntity[];
 
-  @OneToMany(() => UserRolesEntity, (roles) => roles.user)
-  roles: UserRolesEntity;
+  @OneToMany(() => UserRolesEntity, (userRole) => userRole.user)
+  roles: UserRolesEntity[];
 
   @OneToMany(() => RefreshTokenEntity, (refreshToken) => refreshToken.user)
   refreshTokens: RefreshTokenEntity[];
