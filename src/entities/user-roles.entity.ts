@@ -8,9 +8,8 @@ import {
 import { UsersEntity } from './user.entity';
 
 export enum UserRole {
-  ADMIN = 'admin',
-  MODERATOR = 'moderator',
-  USER = 'user',
+  ADMIN = 'ADMIN',
+  USER = 'USER',
 }
 
 @Entity('user_roles')

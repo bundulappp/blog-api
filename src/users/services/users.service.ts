@@ -22,6 +22,7 @@ import { JwtStrategy } from './jwtStrategy';
 import { UserLoginResponseModel } from '../models/dto/user-login-response.model';
 import { AccessTokenPayload } from '../models/acces-token.model';
 import { RefreshTokenPayload } from '../models/refresh-token.model';
+import { UserRole, UserRolesEntity } from 'src/entities/user-roles.entity';
 
 @Injectable()
 export class UsersService {
@@ -32,6 +33,8 @@ export class UsersService {
     private userRelationshipRepository: Repository<UserRelationshipEntity>,
     @InjectRepository(RefreshTokenEntity)
     private refreshTokenRepository: Repository<RefreshTokenEntity>,
+    @InjectRepository(UserRolesEntity)
+    private userRoleRepository: Repository<UserRolesEntity>,
     private jwtService: JwtService,
     private jwtStrategy: JwtStrategy,
   ) {}
@@ -60,8 +63,20 @@ export class UsersService {
     newUser.createdAt = new Date();
     newUser.updatedAt = new Date();
 
+    this.connectRegularUserWithRole(newUser);
+
     this.userRepository.save(newUser);
     return newUser;
+  }
+
+  connectRegularUserWithRole(user: UsersEntity): Promise<UserRolesEntity> {
+    const userRole = new UserRolesEntity();
+    userRole.role = UserRole.USER;
+    userRole.description =
+      'User has limited permissions, such as creating and updating their own blog posts and comments.';
+    userRole.user = user;
+
+    return this.userRoleRepository.save(userRole);
   }
 
   findAll() {

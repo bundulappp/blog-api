@@ -9,8 +9,8 @@ export const dataSourceOptions: DataSourceOptions = {
   username: 'root',
   password: process.env.DB_PASSWORD,
   database: 'blog',
-  entities: [__dirname + '/../entities/**.entity{.ts,.js}'],
-  migrations: [__dirname + '/../migrations/**/*{.ts,.js}'],
+  entities: [__dirname + '/src/entities/**.entity{.ts,.js}'],
+  migrations: [__dirname + '/src/migrations/**/*{.ts,.js}'],
   migrationsTableName: 'migrations',
   synchronize: true,
 };
