@@ -405,24 +405,4 @@ export class UsersService {
 
     return authResult;
   }
-
-  //create a function to seed user_role table
-  // async seedUserTable(): Promise<void> {
-  //   const admin = new UsersEntity();
-  //   admin.username = 'admin';
-  //   admin.email = 'admin@blog.eu';
-  //   admin.password = process.env.ADMIN_SECRET;
-  //   admin.isActive = true;
-  //   admin.isVerified = true;
-
-  //   const moderator = new UsersEntity();
-  //   moderator.username = 'moderato';
-  //   moderator.email = 'moderator@blog.eu';
-  //   moderator.password = process.env.MODERATOR_SECRET;
-  //   moderator.isActive = true;
-  //   moderator.isVerified = true;
-
-  //   this.userRepository.save(admin);
-  //   this.userRepository.save(moderator);
-  // }
 }
