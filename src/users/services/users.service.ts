@@ -55,6 +55,7 @@ export class UsersService {
     if (userWithSameUsername) {
       throw new ConflictException('User already exists with this username');
     }
+
     const salt = await bcrypt.genSalt();
     const hash = await bcrypt.hash(createUserDto.password, salt);
 
@@ -63,13 +64,16 @@ export class UsersService {
     newUser.createdAt = new Date();
     newUser.updatedAt = new Date();
 
-    this.connectRegularUserWithRole(newUser);
+    await this.userRepository.save(newUser);
 
-    this.userRepository.save(newUser);
+    await this.connectRegularUserWithRole(newUser);
+
     return newUser;
   }
 
-  connectRegularUserWithRole(user: UsersEntity): Promise<UserRolesEntity> {
+  async connectRegularUserWithRole(
+    user: UsersEntity,
+  ): Promise<UserRolesEntity> {
     const userRole = new UserRolesEntity();
     userRole.role = UserRole.USER;
     userRole.description =
