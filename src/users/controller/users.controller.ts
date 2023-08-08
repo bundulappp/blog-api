@@ -5,12 +5,11 @@ import {
   Body,
   Param,
   Request,
-  UnprocessableEntityException,
-  NotFoundException,
   Put,
   UseGuards,
   Delete,
-  UnauthorizedException,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
 import { UsersService } from '../services/users.service';
 import { UserDto } from '../models/dto/user.dto';
@@ -20,10 +19,32 @@ import { ChangePasswordViewModel } from '../models/change-password-view.model';
 import { UserLoginResponseModel } from '../models/dto/user-login-response.model';
 import { TokenRequestDto } from '../models/dto/token-request.dto';
 import { UserUpdateDto } from '../models/dto/user-update.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import * as path from 'path';
+import { v4 as uuidv4 } from 'uuid';
+import { PhotoUploadDto } from 'src/photos/models/photo-upload.dto';
+import { PhotosService } from 'src/photos/services/photos.service';
+
+export const storage = {
+  storage: diskStorage({
+    destination: './uploads/profileImages',
+    filename: (req, file, cb) => {
+      const filename: string =
+        path.parse(file.originalname).name.replace(/\s/g, '') + uuidv4();
+      const extension: string = path.parse(file.originalname).ext;
+
+      cb(null, `${filename}${extension}`);
+    },
+  }),
+};
 
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly photoService: PhotosService,
+  ) {}
 
   @Post('register')
   create(@Body() createUserDto: UserDto) {
@@ -88,5 +109,13 @@ export class UsersController {
   @Post('refresh-token')
   refreshToken(@Body() tokenRequestDto: TokenRequestDto) {
     return this.usersService.refreshToken(tokenRequestDto);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('/profile-image/upload')
+  @UseInterceptors(FileInterceptor('photo', storage))
+  async uploadSingle(@UploadedFile() file: PhotoUploadDto, @Request() req) {
+    const user = await this.usersService.findOneById(req.user.id);
+    return this.photoService.uploadSingle(file, user);
   }
 }

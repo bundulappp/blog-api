@@ -10,22 +10,25 @@ import { JwtAuthGuard } from './services/authGuard';
 import * as dotenv from 'dotenv';
 import { RefreshTokenEntity } from '../entities/refresh-token.entity';
 import { JwtStrategy } from './services/jwtStrategy';
+import { PhotosService } from 'src/photos/services/photos.service';
+import { PhotoEntity } from 'src/entities/photo.entity';
 dotenv.config();
 
 @Module({
   imports: [
     JwtModule.register({
       secret: process.env.JWT_SECRET,
-      signOptions: { expiresIn: '30m' },
+      signOptions: { expiresIn: '600s' },
     }),
     TypeOrmModule.forFeature([
       UsersEntity,
       UserRelationshipEntity,
       UserRolesEntity,
       RefreshTokenEntity,
+      PhotoEntity,
     ]),
   ],
-  providers: [UsersService, JwtAuthGuard, JwtStrategy],
+  providers: [UsersService, JwtAuthGuard, JwtStrategy, PhotosService],
   controllers: [UsersController],
 })
 export class UsersModule {}
