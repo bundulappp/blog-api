@@ -27,114 +27,66 @@ export class UsersController {
 
   @Post('register')
   create(@Body() createUserDto: UserDto) {
-    try {
-      return this.usersService.create(createUserDto);
-    } catch (error) {
-      throw new UnprocessableEntityException(error.errmsg);
-    }
+    return this.usersService.create(createUserDto);
   }
 
   @Get()
   findAll(): Promise<UserDto[]> {
-    try {
-      return this.usersService.findAll();
-    } catch (error) {
-      throw new NotFoundException('Users not found');
-    }
+    return this.usersService.findAll();
   }
 
   @Get(':userId')
   findOne(@Param('userId') id: string): Promise<UserDto> {
-    try {
-      return this.usersService.findOneById(+id);
-    } catch (error) {
-      throw new NotFoundException('User not found');
-    }
+    return this.usersService.findOneById(+id);
   }
 
   @Post('login')
   login(@Body() userData: UserLoginView): Promise<UserLoginResponseModel> {
-    try {
-      return this.usersService.login(userData);
-    } catch (error) {
-      throw new NotFoundException('User not found');
-    }
+    return this.usersService.login(userData);
   }
 
   @UseGuards(JwtAuthGuard)
   @Put('deactive')
   update(@Request() req) {
-    try {
-      return this.usersService.disable(req);
-    } catch (error) {
-      throw new NotFoundException('User not found');
-    }
+    return this.usersService.disable(req);
   }
 
   @UseGuards(JwtAuthGuard)
   @Put()
   updateById(@Request() req, @Body() updateUserDto: UserUpdateDto) {
-    try {
-      return this.usersService.update(req, updateUserDto);
-    } catch (error) {
-      throw new NotFoundException('User not found');
-    }
+    return this.usersService.update(req, updateUserDto);
   }
 
   @UseGuards(JwtAuthGuard)
   @Put('change-password')
   changePassword(@Request() req, @Body() userData: ChangePasswordViewModel) {
-    try {
-      return this.usersService.changePassword(req, userData);
-    } catch (error) {
-      throw new NotFoundException('User not found');
-    }
+    return this.usersService.changePassword(req, userData);
   }
 
   @UseGuards(JwtAuthGuard)
   @Post(':userId/follow')
   followUser(@Request() req, @Param('userId') userId: number) {
-    try {
-      return this.usersService.followUser(req, userId);
-    } catch (error) {
-      throw new NotFoundException('User not found');
-    }
+    return this.usersService.followUser(req, userId);
   }
 
   @UseGuards(JwtAuthGuard)
   @Delete(':userId/unfollow')
   unfollowUser(@Request() req, @Param('userId') userId: number) {
-    try {
-      return this.usersService.unfollowUser(req, userId);
-    } catch (error) {
-      throw new NotFoundException('User not found');
-    }
+    return this.usersService.unfollowUser(req, userId);
   }
 
   @Get('/:userId/followers')
   getFollowers(@Param('userId') userId: number) {
-    try {
-      return this.usersService.getFollowers(+userId);
-    } catch (error) {
-      throw new NotFoundException('User not found');
-    }
+    return this.usersService.getFollowers(+userId);
   }
 
   @Get('/:userId/followings')
   getFollowings(@Param('userId') userId: number) {
-    try {
-      return this.usersService.getFollowings(+userId);
-    } catch (error) {
-      throw new NotFoundException('User not found');
-    }
+    return this.usersService.getFollowings(+userId);
   }
 
   @Post('refresh-token')
   refreshToken(@Body() tokenRequestDto: TokenRequestDto) {
-    try {
-      return this.usersService.refreshToken(tokenRequestDto);
-    } catch (error) {
-      throw new UnauthorizedException('User need to login again');
-    }
+    return this.usersService.refreshToken(tokenRequestDto);
   }
 }
