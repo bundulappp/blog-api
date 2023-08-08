@@ -1,7 +1,10 @@
 export interface PhotoUploadDto {
-  fileName: string;
-  originalName: string;
-  mimeType: string;
+  fieldname: string;
+  originalname: string;
+  encoding: string;
+  mimetype: string;
+  destination: string;
+  filename: string;
   path: string;
   size: number;
   userId: number;
