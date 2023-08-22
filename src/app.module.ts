@@ -6,12 +6,14 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { PhotosModule } from './photos/photos.module';
 import { dataSourceOptions } from 'data-source';
+import { BlogsModule } from './blogs/blogs.module';
 @Module({
   imports: [
     UsersModule,
     ConfigModule.forRoot({ envFilePath: '.env', isGlobal: true }),
     TypeOrmModule.forRoot(dataSourceOptions),
     PhotosModule,
+    BlogsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
