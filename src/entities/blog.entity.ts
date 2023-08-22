@@ -4,10 +4,10 @@ import {
   Column,
   ManyToOne,
   JoinColumn,
-  CreateDateColumn,
-  UpdateDateColumn,
+  OneToMany,
 } from 'typeorm';
 import { UsersEntity } from './user.entity';
+import { CommentEntity } from './comment.entity';
 
 @Entity('blogs')
 export class BlogEntity {
@@ -23,13 +23,13 @@ export class BlogEntity {
   @Column('text')
   content: string;
 
-  @CreateDateColumn({
+  @Column({
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP',
   })
   createdAt: Date;
 
-  @UpdateDateColumn({
+  @Column({
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP',
   })
@@ -38,4 +38,7 @@ export class BlogEntity {
   @ManyToOne(() => UsersEntity, (user) => user.id, { eager: true })
   @JoinColumn({ name: 'authorId' })
   author: UsersEntity;
+
+  @OneToMany(() => CommentEntity, (comment) => comment.blog)
+  comments: CommentEntity[];
 }
