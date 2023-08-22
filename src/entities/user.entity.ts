@@ -3,6 +3,7 @@ import { UserRelationshipEntity } from './user-relationship.entity';
 import { UserRolesEntity } from './user-roles.entity';
 import { RefreshTokenEntity } from './refresh-token.entity';
 import { PhotoEntity } from 'src/entities/photo.entity';
+import { BlogEntity } from './blog.entity';
 
 @Entity('users')
 export class UsersEntity {
@@ -58,4 +59,7 @@ export class UsersEntity {
 
   @OneToMany(() => PhotoEntity, (photo) => photo.user)
   photos: PhotoEntity[];
+
+  @OneToMany(() => BlogEntity, (blog) => blog.author)
+  blogs: BlogEntity[];
 }
