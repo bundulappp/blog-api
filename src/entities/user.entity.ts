@@ -5,6 +5,7 @@ import { RefreshTokenEntity } from './refresh-token.entity';
 import { PhotoEntity } from 'src/entities/photo.entity';
 import { BlogEntity } from './blog.entity';
 import { CommentEntity } from './comment.entity';
+import { BlogLikesEntity } from './blog-like.entity';
 
 @Entity('users')
 export class UsersEntity {
@@ -66,4 +67,7 @@ export class UsersEntity {
 
   @OneToMany(() => CommentEntity, (comment) => comment.author)
   comments: CommentEntity[];
+
+  @OneToMany(() => BlogLikesEntity, (like) => like.user)
+  userLikes: BlogLikesEntity[];
 }
