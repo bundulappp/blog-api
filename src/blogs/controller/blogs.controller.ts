@@ -34,7 +34,6 @@ export class BlogsController {
     @User() userToken,
     @Body() createBlogDto: CreateBlogDto,
   ): Promise<BlogEntity> {
-    console.log('hello');
     return this.blogsService.create(userToken, createBlogDto);
   }
 
