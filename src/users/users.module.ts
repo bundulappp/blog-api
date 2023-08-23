@@ -9,7 +9,7 @@ import { UserRolesEntity } from '../entities/user-roles.entity';
 import { JwtAuthGuard } from '../shared/guards/authGuard';
 import * as dotenv from 'dotenv';
 import { RefreshTokenEntity } from '../entities/refresh-token.entity';
-import { JwtStrategy } from './services/jwtStrategy';
+import { JwtStrategy } from '../shared/strategies/jwtStrategy';
 import { PhotosService } from 'src/photos/services/photos.service';
 import { PhotoEntity } from 'src/entities/photo.entity';
 dotenv.config();

@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import * as dotenv from 'dotenv';
 import { JwtAuthGuard } from 'src/shared/guards/authGuard';
-import { JwtStrategy } from 'src/users/services/jwtStrategy';
+import { JwtStrategy } from 'src/shared/strategies/jwtStrategy';
 dotenv.config();
 
 @Module({

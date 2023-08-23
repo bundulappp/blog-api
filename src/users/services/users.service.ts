@@ -18,7 +18,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { AuthResultModel } from '../models/auth-result.model';
 import { RefreshTokenEntity } from '../../entities/refresh-token.entity';
 import { TokenRequestDto } from '../models/dto/token-request.dto';
-import { JwtStrategy } from './jwtStrategy';
+import { JwtStrategy } from '../../shared/strategies/jwtStrategy';
 import { UserLoginResponseModel } from '../models/dto/user-login-response.model';
 import { AccessTokenPayload } from '../models/acces-token.model';
 import { RefreshTokenPayload } from '../models/refresh-token.model';
