@@ -137,19 +137,11 @@ export class UsersService {
     };
   }
 
-  async disable(request: any): Promise<void> {
-    const token = request.headers.authorization.split(' ')[1];
-    const isVerified = this.jwtService.verify(token);
-
-    if (!isVerified) {
-      throw new UnauthorizedException('User not verified');
-    }
-    const user = this.userRepository.findOne({ where: { id: isVerified.id } });
-
+  async disable(user: AccessTokenPayload): Promise<void> {
     if (!user) {
       throw new NotFoundException('User not found');
     }
-    this.userRepository.update(isVerified.id, { isActive: false });
+    this.userRepository.update(user.id, { isActive: false });
   }
 
   async validateUser(username: string, pass: string): Promise<any> {
@@ -193,25 +185,22 @@ export class UsersService {
     };
   }
 
-  async update(req: any, updateUserDto: UpdateUserViewModel): Promise<number> {
-    const token = req.headers.authorization.split(' ')[1];
-    const decodedToken = this.jwtService.verify(token);
-    if (!decodedToken || !decodedToken.id) {
-      throw new NotFoundException('User not found');
-    }
-
-    const user = await this.userRepository.findOne({
-      where: { id: decodedToken.id },
+  async update(
+    user: AccessTokenPayload,
+    updateUserDto: UpdateUserViewModel,
+  ): Promise<number> {
+    const userEntity = await this.userRepository.findOne({
+      where: { id: user.id },
     });
 
     if (!user) {
       throw new NotFoundException('User not found');
     }
 
-    user.updatedAt = new Date();
+    userEntity.updatedAt = new Date();
 
     const updatedUser = await this.userRepository.save({
-      ...user,
+      ...userEntity,
       ...updateUserDto,
     });
 
@@ -219,19 +208,12 @@ export class UsersService {
   }
 
   async changePassword(
-    req: any,
+    userToken: AccessTokenPayload,
     passwordData: ChangePasswordViewModel,
   ): Promise<void> {
-    const token = req.headers.authorization.split(' ')[1];
-    const decodedToken = this.jwtService.verify(token);
-    if (!decodedToken || !decodedToken.id) {
-      throw new NotFoundException('User not found');
-    }
-
     const user = await this.userRepository.findOne({
-      where: { id: decodedToken.id },
+      where: { id: userToken.id },
     });
-
     if (!user) {
       throw new NotFoundException('User not found');
     }
@@ -254,19 +236,16 @@ export class UsersService {
     await this.userRepository.save(user);
   }
 
-  async followUser(req: any, userId: number): Promise<void> {
-    const token = req.headers.authorization.split(' ')[1];
-    const decodedToken = this.jwtService.verify(token);
-
-    if (!decodedToken || !decodedToken.id) {
-      throw new NotFoundException('User not found');
-    }
-    if (decodedToken.id === +userId) {
+  async followUser(
+    userToken: AccessTokenPayload,
+    userId: number,
+  ): Promise<void> {
+    if (userToken.id === +userId) {
       throw new ConflictException('Users are not able to follow themselves');
     }
 
     const user = await this.userRepository.findOne({
-      where: { id: decodedToken.id },
+      where: { id: userToken.id },
     });
 
     if (!user) {
@@ -302,16 +281,12 @@ export class UsersService {
     this.userRelationshipRepository.save(userRelationshipEntity);
   }
 
-  async unfollowUser(req: any, userId: number): Promise<void> {
-    const token = req.headers.authorization.split(' ')[1];
-    const decodedToken = this.jwtService.verify(token);
-
-    if (!decodedToken || !decodedToken.id) {
-      throw new NotFoundException('User not found');
-    }
-
+  async unfollowUser(
+    userToken: AccessTokenPayload,
+    userId: number,
+  ): Promise<void> {
     const user = await this.userRepository.findOne({
-      where: { id: decodedToken.id },
+      where: { id: userToken.id },
     });
 
     if (!user) {
@@ -386,7 +361,7 @@ export class UsersService {
     );
 
     const user = await this.userRepository.findOne({
-      where: { id: decodedAccessToken.userId },
+      where: { id: decodedAccessToken.id },
     });
 
     if (!user) {

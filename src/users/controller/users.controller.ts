@@ -25,6 +25,7 @@ import * as path from 'path';
 import { v4 as uuidv4 } from 'uuid';
 import { PhotoUploadDto } from 'src/photos/models/photo-upload.dto';
 import { PhotosService } from 'src/photos/services/photos.service';
+import { User } from '../decorator/user.decorator';
 
 export const storage = {
   storage: diskStorage({
@@ -68,32 +69,32 @@ export class UsersController {
 
   @UseGuards(JwtAuthGuard)
   @Put('deactive')
-  update(@Request() req) {
-    return this.usersService.disable(req);
+  update(@User() userToken) {
+    return this.usersService.disable(userToken);
   }
 
   @UseGuards(JwtAuthGuard)
   @Put()
-  updateById(@Request() req, @Body() updateUserDto: UserUpdateDto) {
-    return this.usersService.update(req, updateUserDto);
+  updateById(@User() userToken, @Body() updateUserDto: UserUpdateDto) {
+    return this.usersService.update(userToken, updateUserDto);
   }
 
   @UseGuards(JwtAuthGuard)
   @Put('change-password')
-  changePassword(@Request() req, @Body() userData: ChangePasswordViewModel) {
-    return this.usersService.changePassword(req, userData);
+  changePassword(@User() userToken, @Body() userData: ChangePasswordViewModel) {
+    return this.usersService.changePassword(userToken, userData);
   }
 
   @UseGuards(JwtAuthGuard)
   @Post(':userId/follow')
-  followUser(@Request() req, @Param('userId') userId: number) {
-    return this.usersService.followUser(req, userId);
+  followUser(@User() userToken, @Param('userId') userId: number) {
+    return this.usersService.followUser(userToken, userId);
   }
 
   @UseGuards(JwtAuthGuard)
   @Delete(':userId/unfollow')
-  unfollowUser(@Request() req, @Param('userId') userId: number) {
-    return this.usersService.unfollowUser(req, userId);
+  unfollowUser(@User() userToken, @Param('userId') userId: number) {
+    return this.usersService.unfollowUser(userToken, userId);
   }
 
   @Get('/:userId/followers')
@@ -114,8 +115,7 @@ export class UsersController {
   @UseGuards(JwtAuthGuard)
   @Post('/profile-image/upload')
   @UseInterceptors(FileInterceptor('photo', storage))
-  async uploadSingle(@UploadedFile() file: PhotoUploadDto, @Request() req) {
-    const user = await this.usersService.findOneById(req.user.id);
-    return this.photoService.uploadSingle(file, user);
+  async uploadSingle(@UploadedFile() file: PhotoUploadDto, @User() userToken) {
+    return this.photoService.uploadSingle(file, userToken);
   }
 }
