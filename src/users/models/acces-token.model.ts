@@ -1,5 +1,5 @@
 export interface AccessTokenPayload {
-  userId: number;
+  id: number;
   username: string;
   email: string;
   expiredAt: Date;
