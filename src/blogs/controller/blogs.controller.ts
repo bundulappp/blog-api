@@ -7,10 +7,13 @@ import {
   Param,
   Body,
   UseGuards,
+  Request,
 } from '@nestjs/common';
 import { BlogEntity } from 'src/entities/blog.entity';
 import { JwtAuthGuard } from 'src/users/services/authGuard';
 import { BlogsService } from '../services/blogs.service';
+import { CreateBlogDto } from '../dto/create-blog,dto';
+import { User } from 'src/users/decorator/user.decorator';
 
 @Controller('blogs')
 export class BlogsController {
@@ -28,8 +31,12 @@ export class BlogsController {
 
   @UseGuards(JwtAuthGuard)
   @Post()
-  create(@Body() blog: BlogEntity): Promise<BlogEntity> {
-    return this.blogsService.create(blog);
+  create(
+    @User() userToken,
+    @Body() createBlogDto: CreateBlogDto,
+  ): Promise<BlogEntity> {
+    console.log('hello');
+    return this.blogsService.create(userToken, createBlogDto);
   }
 
   @UseGuards(JwtAuthGuard)
