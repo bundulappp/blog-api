@@ -9,7 +9,7 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import * as path from 'path';
-import { JwtAuthGuard } from 'src/users/services/authGuard';
+import { JwtAuthGuard } from 'src/shared/guards/authGuard';
 import { v4 as uuidv4 } from 'uuid';
 
 export const storage = {

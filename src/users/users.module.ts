@@ -6,7 +6,7 @@ import { UsersController } from './controller/users.controller';
 import { UsersEntity } from '../entities/user.entity';
 import { UserRelationshipEntity } from '../entities/user-relationship.entity';
 import { UserRolesEntity } from '../entities/user-roles.entity';
-import { JwtAuthGuard } from './services/authGuard';
+import { JwtAuthGuard } from '../shared/guards/authGuard';
 import * as dotenv from 'dotenv';
 import { RefreshTokenEntity } from '../entities/refresh-token.entity';
 import { JwtStrategy } from './services/jwtStrategy';

@@ -7,10 +7,9 @@ import {
   Param,
   Body,
   UseGuards,
-  Request,
 } from '@nestjs/common';
 import { BlogEntity } from 'src/entities/blog.entity';
-import { JwtAuthGuard } from 'src/users/services/authGuard';
+import { JwtAuthGuard } from 'src/shared/guards/authGuard';
 import { BlogsService } from '../services/blogs.service';
 import { CreateBlogDto } from '../dto/create-blog,dto';
 import { User } from 'src/users/decorator/user.decorator';
