@@ -30,5 +30,6 @@ dotenv.config();
   ],
   providers: [UsersService, JwtAuthGuard, JwtStrategy, PhotosService],
   controllers: [UsersController],
+  exports: [JwtAuthGuard],
 })
 export class UsersModule {}
