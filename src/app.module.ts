@@ -7,13 +7,15 @@ import { ConfigModule } from '@nestjs/config';
 import { PhotosModule } from './photos/photos.module';
 import { dataSourceOptions } from 'data-source';
 import { BlogsModule } from './blogs/blogs.module';
+import { SharedModule } from './shared/shared.module';
 @Module({
   imports: [
-    UsersModule,
     ConfigModule.forRoot({ envFilePath: '.env', isGlobal: true }),
     TypeOrmModule.forRoot(dataSourceOptions),
+    UsersModule,
     PhotosModule,
     BlogsModule,
+    SharedModule,
   ],
   controllers: [AppController],
   providers: [AppService],

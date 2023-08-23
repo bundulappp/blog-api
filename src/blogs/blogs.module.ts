@@ -7,9 +7,11 @@ import { CommentEntity } from 'src/entities/comment.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersEntity } from 'src/entities/user.entity';
 import { UsersModule } from 'src/users/users.module';
+import { SharedModule } from 'src/shared/shared.module';
 
 @Module({
   imports: [
+    SharedModule,
     TypeOrmModule.forFeature([
       BlogEntity,
       BlogLikesEntity,
