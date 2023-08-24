@@ -8,14 +8,17 @@ import {
   Body,
   UseGuards,
   UseInterceptors,
+  UploadedFiles,
+  UploadedFile,
 } from '@nestjs/common';
 import { BlogEntity } from 'src/entities/blog.entity';
 import { JwtAuthGuard } from 'src/shared/guards/authGuard';
 import { BlogsService } from '../services/blogs.service';
 import { CreateBlogDto } from '../dto/create-blog,dto';
 import { User } from 'src/users/decorator/user.decorator';
-import { FilesInterceptor } from '@nestjs/platform-express';
+import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { getStorageConfig } from 'src/utilities/storageCongif';
+import { AccessTokenPayload } from 'src/users/models/acces-token.model';
 
 @Controller('blogs')
 export class BlogsController {
@@ -33,14 +36,15 @@ export class BlogsController {
 
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(
-    FilesInterceptor('image', 10, getStorageConfig('./uploads/blog-images')),
+    FileInterceptor('image', getStorageConfig('./uploads/blog-images')),
   )
   @Post()
   create(
     @User() userToken,
     @Body() createBlogDto: CreateBlogDto,
+    @UploadedFile() file,
   ): Promise<BlogEntity> {
-    return this.blogsService.create(userToken, createBlogDto);
+    return this.blogsService.create(userToken, createBlogDto, file);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -56,5 +60,14 @@ export class BlogsController {
   @Delete(':id')
   async remove(@Param('id') id: number): Promise<void> {
     return this.blogsService.remove(id);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Put('/:blogId/like')
+  async likeBlog(
+    @Param('blogId') blogId: number,
+    @User() userToken: AccessTokenPayload,
+  ) {
+    return this.blogsService.likeBlog(blogId, userToken);
   }
 }

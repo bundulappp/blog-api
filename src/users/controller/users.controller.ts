@@ -4,7 +4,6 @@ import {
   Post,
   Body,
   Param,
-  Request,
   Put,
   UseGuards,
   Delete,
@@ -20,9 +19,6 @@ import { UserLoginResponseModel } from '../models/dto/user-login-response.model'
 import { TokenRequestDto } from '../models/dto/token-request.dto';
 import { UserUpdateDto } from '../models/dto/user-update.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
-import * as path from 'path';
-import { v4 as uuidv4 } from 'uuid';
 import { PhotoUploadDto } from 'src/photos/models/photo-upload.dto';
 import { PhotosService } from 'src/photos/services/photos.service';
 import { User } from '../decorator/user.decorator';
@@ -103,7 +99,7 @@ export class UsersController {
   @UseGuards(JwtAuthGuard)
   @Post('/profile-image/upload')
   @UseInterceptors(
-    FileInterceptor('photo', getStorageConfig('./uploads/profile-images')),
+    FileInterceptor('image', getStorageConfig('./uploads/profile-images')),
   )
   async uploadSingle(@UploadedFile() file: PhotoUploadDto, @User() userToken) {
     return this.photoService.uploadSingle(file, userToken);
