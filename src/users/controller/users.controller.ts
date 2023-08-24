@@ -26,19 +26,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { PhotoUploadDto } from 'src/photos/models/photo-upload.dto';
 import { PhotosService } from 'src/photos/services/photos.service';
 import { User } from '../decorator/user.decorator';
-
-export const storage = {
-  storage: diskStorage({
-    destination: './uploads/profileImages',
-    filename: (req, file, cb) => {
-      const filename: string =
-        path.parse(file.originalname).name.replace(/\s/g, '') + uuidv4();
-      const extension: string = path.parse(file.originalname).ext;
-
-      cb(null, `${filename}${extension}`);
-    },
-  }),
-};
+import { getStorageConfig } from 'src/utilities/storageCongif';
 
 @Controller('users')
 export class UsersController {
@@ -114,7 +102,9 @@ export class UsersController {
 
   @UseGuards(JwtAuthGuard)
   @Post('/profile-image/upload')
-  @UseInterceptors(FileInterceptor('photo', storage))
+  @UseInterceptors(
+    FileInterceptor('photo', getStorageConfig('./uploads/profile-images')),
+  )
   async uploadSingle(@UploadedFile() file: PhotoUploadDto, @User() userToken) {
     return this.photoService.uploadSingle(file, userToken);
   }

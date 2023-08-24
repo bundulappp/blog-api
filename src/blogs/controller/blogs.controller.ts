@@ -7,12 +7,15 @@ import {
   Param,
   Body,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { BlogEntity } from 'src/entities/blog.entity';
 import { JwtAuthGuard } from 'src/shared/guards/authGuard';
 import { BlogsService } from '../services/blogs.service';
 import { CreateBlogDto } from '../dto/create-blog,dto';
 import { User } from 'src/users/decorator/user.decorator';
+import { FilesInterceptor } from '@nestjs/platform-express';
+import { getStorageConfig } from 'src/utilities/storageCongif';
 
 @Controller('blogs')
 export class BlogsController {
@@ -29,6 +32,9 @@ export class BlogsController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @UseInterceptors(
+    FilesInterceptor('image', 10, getStorageConfig('./uploads/blog-images')),
+  )
   @Post()
   create(
     @User() userToken,
