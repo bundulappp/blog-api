@@ -7,6 +7,7 @@ import { CommentEntity } from 'src/entities/comment.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersEntity } from 'src/entities/user.entity';
 import { SharedModule } from 'src/shared/shared.module';
+import { PhotoEntity } from 'src/entities/photo.entity';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { SharedModule } from 'src/shared/shared.module';
       BlogLikesEntity,
       CommentEntity,
       UsersEntity,
+      PhotoEntity,
     ]),
   ],
   providers: [BlogsService],

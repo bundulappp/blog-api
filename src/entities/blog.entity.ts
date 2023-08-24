@@ -9,6 +9,7 @@ import {
 import { UsersEntity } from './user.entity';
 import { CommentEntity } from './comment.entity';
 import { BlogLikesEntity } from './blog-like.entity';
+import { PhotoEntity } from './photo.entity';
 
 @Entity('blogs')
 export class BlogEntity {
@@ -48,4 +49,7 @@ export class BlogEntity {
 
   @OneToMany(() => BlogLikesEntity, (like) => like.blog)
   likes: BlogLikesEntity[];
+
+  @OneToMany(() => PhotoEntity, (photo) => photo.blog, { eager: true })
+  photos: PhotoEntity[];
 }

@@ -6,6 +6,7 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { BlogEntity } from './blog.entity';
 
 @Entity('photos')
 export class PhotoEntity {
@@ -40,4 +41,8 @@ export class PhotoEntity {
   @ManyToOne(() => UsersEntity, (user) => user.photos)
   @JoinColumn({ name: 'userId' })
   user: UsersEntity;
+
+  @ManyToOne(() => BlogEntity, (blog) => blog.photos)
+  @JoinColumn({ name: 'blogId' })
+  blog: BlogEntity;
 }
