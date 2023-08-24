@@ -70,4 +70,13 @@ export class BlogsController {
   ) {
     return this.blogsService.likeBlog(blogId, userToken);
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Put('/:blogId/dislike')
+  async dislikeBlog(
+    @Param('blogId') blogId: number,
+    @User() userToken: AccessTokenPayload,
+  ) {
+    return this.blogsService.dislikeBlog(blogId, userToken);
+  }
 }

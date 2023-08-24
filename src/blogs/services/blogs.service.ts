@@ -116,4 +116,34 @@ export class BlogsService {
       likeCount: blog.likeCount + 1,
     });
   }
+
+  async dislikeBlog(id: number, userToken: AccessTokenPayload): Promise<void> {
+    const user = await this.userRepository.findOne({
+      where: { id: userToken.id },
+    });
+
+    if (!user) {
+      throw new UnauthorizedException('User is not found or not authorized');
+    }
+
+    const blog = await this.blogRepository.findOne({ where: { id: id } });
+
+    if (!blog) {
+      throw new NotFoundException('Blog is not found');
+    }
+
+    const blogLikeEntity = await this.blogLikeRepository.findOne({
+      where: { user: user, blog: blog },
+    });
+
+    if (!blogLikeEntity) {
+      throw new ConflictException('User does not like this blog yet');
+    }
+
+    await this.blogRepository.update(blog.id, {
+      likeCount: blog.likeCount - 1,
+    });
+
+    await this.blogLikeRepository.remove(blogLikeEntity);
+  }
 }
