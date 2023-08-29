@@ -12,7 +12,7 @@ dotenv.config();
     TypeOrmModule.forFeature([RefreshTokenEntity]),
     JwtModule.register({
       secret: process.env.JWT_SECRET,
-      signOptions: { expiresIn: '1200s' },
+      signOptions: { expiresIn: '2d' },
     }),
   ],
   providers: [JwtAuthGuard, JwtStrategy],
